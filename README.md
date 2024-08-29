@@ -33,7 +33,7 @@ Output example:
 268
 ```
 
-## Zabbix integration
+## Zabbix integration
 - Make sure your zabbix server has:
   - php
   - php_sqlite
@@ -55,7 +55,7 @@ sudo chown -R zabbix: /usr/lib/zabbix/externalscripts/Collabora-seats-counter/
 sudo chown zabbix: /usr/lib/zabbix/externalscripts/php
 ```
 
-### Zabbix web ui
+### Zabbix web ui
 
 - In a template, create two items
 
