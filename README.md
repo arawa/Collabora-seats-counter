@@ -1,6 +1,6 @@
 # CollaboraOnline user counter
 
-Used to mesure the amount of unique users using CollaboraOnline.
+Used to measure the amount of unique users using CollaboraOnline.
 These two scripts can be used as a standalone or integrated into zabbix.
 
 ## Installation
@@ -9,7 +9,7 @@ These two scripts can be used as a standalone or integrated into zabbix.
 
 ## Data gathering
 
-Run regullary this script (for example every 5 minutes via crontab)
+Run regularly this script (for example every 5 minutes via crontab)
 
 ```
 php cool_current_user_count.php https://my-collabora-instance.localnet username password
@@ -63,14 +63,14 @@ sudo chown zabbix: /usr/lib/zabbix/externalscripts/php
   - Type: `External check`
   - Key: `php["/usr/lib/zabbix/externalscripts/Collabora-seats-counter/cool_current_user_count.php","{$WEB_URL}","{$WEB_URL_USER}" ,"{$WEB_URL_PASSWORD}"]`
   - Type of information: `Numeric (unsigned)`
-  - Update interal: `1m`
+  - Update interval: `1m`
   - Tags: `Application`: `CollaboraOnline`
 
 - Name: `CollaboraOnline seats used`
   - Type: `External check`
   - Key: `php["/usr/lib/zabbix/externalscripts/Collabora-seats-counter/cool_unique_users.php","{$WEB_URL}"]`
   - Type of information: `Numeric (unsigned)`
-  - Update interal: `5m`
+  - Update interval: `5m`
   - Tags: `Application`: `CollaboraOnline`
 
 On each hosts, if not already, define the following macros:
