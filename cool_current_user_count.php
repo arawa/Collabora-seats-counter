@@ -7,7 +7,11 @@
 require __DIR__ . '/vendor/autoload.php';
 define('ROOTPATH', __DIR__);
 
-$database=(ROOTPATH."/cool_user_counter.sqlite");
+$configFile = ROOTPATH . '/config.php';
+if (file_exists($configFile)) {
+	include($configFile);
+}
+
 $CollaboraWebURL = isset($argv[1]) ? $argv[1] : null;
 $CollaboraAdminUser = isset($argv[2]) ? $argv[2] : null;
 $CollaboraAdminPassword = isset($argv[3]) ? $argv[3] : null;
@@ -54,6 +58,7 @@ try {
 	$documents = ($message);
 } catch (\WebSocket\ConnectionException $e) {
 	echo "Error: $e \n";
+	exit;
 } finally {
 	$client->close();
 }
@@ -68,11 +73,13 @@ if (substr($documents, 0, strlen($prefix)) == $prefix) {
 $documents=(json_decode($documents, true));
 
 // Create the sqlite database if it doesn't exists yet
-$db = new SQLite3($database, SQLITE3_OPEN_CREATE | SQLITE3_OPEN_READWRITE);
+$db = new SQLite3(ROOTPATH."/".$CONFIG['database'], SQLITE3_OPEN_CREATE | SQLITE3_OPEN_READWRITE);
 $db->query('CREATE TABLE IF NOT EXISTS "stats" (
     "userId" VARCHAR,
     "docKey" VARCHAR,
 	"instance" VARCHAR,
+	"guest" BOOLEAN,
+	"source" VARCHAR,
     "timestamp" DATETIME,
 	PRIMARY KEY (userId, docKey)
 )');
@@ -85,12 +92,25 @@ foreach ($documents["documents"] as $index => $document) {
 	// echo "User count : ". sizeof($document["views"]);
 	$user_count+=sizeof($document["views"]);
 	foreach($document["views"] as $user) {
+		// A bit of guess work
+		//  . Is the user a guest?
+		//	  If so, userName is like "john (Guest)" and userId like "Guest-8vi6cyBl"
+		$userNameCatcher = '/.*?\(Guest\)$/m';  //anyString (Guest)
+		$userIdCatcher = '/^Guest-.{8}$/m';		// Guest-8characters
+		if (preg_match($userNameCatcher, $user['userName']) && preg_match($userIdCatcher, $user['userName'])) {
+			$guest = 1;
+		} else {
+			$guest = 0;
+		}
+
 		// Store in database
-		$statement = $db->prepare('INSERT or IGNORE INTO "stats" ("userId", "docKey", "instance", "timestamp")
-			VALUES (:uid, :dockey, :instance, :timestamp)');
+		$statement = $db->prepare('INSERT or IGNORE INTO "stats" ("userId", "docKey", "instance", "guest", "source", "timestamp")
+			VALUES (:uid, :dockey, :instance, :guest, :source, :timestamp)');
 		$statement->bindValue(':uid', $user["userId"]);
 		$statement->bindValue(':dockey', $document["docKey"]);
 		$statement->bindValue(':instance', $CollaboraFQDN);
+		$statement->bindValue(':guest', $guest);
+		$statement->bindValue(':source', $document["wopiHost"]);
 		$statement->bindValue(':timestamp',  date('Y-m-d H:i:s'));
 		$statement->execute();
 	}

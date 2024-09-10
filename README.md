@@ -6,6 +6,8 @@ These two scripts can be used as a standalone or integrated into zabbix.
 ## Installation
 - Clone the repo
 - Run `composer install`
+- Copy config.sample.php `cp config.sample.php config.php`
+- Change config if needed
 
 ## Data gathering
 
@@ -31,6 +33,10 @@ php cool_unique_users.php https://my-collabora-instance.localnet
 Output example:
 ```
 268
+```
+If the Collabora Online instance is used by multiple WopiHosts, you can filter in the wanted one.
+```
+php cool_unique_users.php https://my-collabora-instance.localnet my-wopi-host.localnet
 ```
 
 ## Zabbix integration

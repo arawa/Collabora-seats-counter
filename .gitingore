@@ -1,3 +1,5 @@
 *.sqlite
 /vendor/
 composer.phar
+config.php
+websocket.example
