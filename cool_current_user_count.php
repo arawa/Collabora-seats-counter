@@ -97,7 +97,8 @@ foreach ($documents["documents"] as $index => $document) {
 		//	  If so, userName is like "john (Guest)" and userId like "Guest-8vi6cyBl"
 		$userNameCatcher = '/.*?\(Guest\)$/m';  //anyString (Guest)
 		$userIdCatcher = '/^Guest-.{8}$/m';		// Guest-8characters
-		if (preg_match($userNameCatcher, $user['userName']) && preg_match($userIdCatcher, $user['userName'])) {
+		// if username like ("john doe (Guest)" or "Anonymous guest") and userid is like "Guest-xxxxxxxx".
+		if ((preg_match($userNameCatcher, $user['userName'])|| $user['userName'] == "Anonymous guest") && preg_match($userIdCatcher, $user['userId'])) {
 			$guest = 1;
 		} else {
 			$guest = 0;
