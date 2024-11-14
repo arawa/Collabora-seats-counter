@@ -29,14 +29,17 @@ if (is_null($WopiHost)) {
 $CollaboraFQDN = $url = preg_replace("(^https?://)", "", $CollaboraWebURL );
 
 // Query the amount of users (non-guests) that used Collabora in the last year
+// We also skip "LocalUsers" that might have been saved in the past
 $db = new SQLite3(ROOTPATH."/".$CONFIG['database'], SQLITE3_OPEN_CREATE | SQLITE3_OPEN_READWRITE);
 $count = $db->querySingle("SELECT COUNT (DISTINCT userid)
 			FROM stats
 			WHERE instance='".$CollaboraFQDN."'
 			".$WopiHostCondition."
 			AND timestamp >= Datetime('now', '-525960 minutes', 'localtime')
-			AND guest != 1;
+			AND userid not like 'Guest-%'
+			AND userid not like 'LocalUser%';
 		");
+		// Todo : use the guest column instead of 'Guest-%'
 
 //print the result
 echo($count);

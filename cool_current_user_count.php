@@ -92,7 +92,19 @@ foreach ($documents["documents"] as $index => $document) {
 	// echo "User count : ". sizeof($document["views"]);
 	$user_count+=sizeof($document["views"]);
 	foreach($document["views"] as $user) {
-		// A bit of guess work
+
+		//  A bit of guess work
+		// Is this a locally accessed file (Desktop or mobile direct access)? If so there is
+		// no current way to tell who is who and we will just assume they are Nextcloud users.
+		// So let's ignore them. They all have a userId like "LocalUser(int*)"
+		$userIdCatcher = '/^LocalUser\d*/m'; //Localuserxxxx
+		// They also have a dockey looking like "/opt/cool/child-roots/tmp/incoming/cool-***/callbackwrapper"
+		$docKeyCatcher = '/.*child-roots.*/m';
+		if (preg_match($userIdCatcher, $user['userId']) && preg_match($docKeyCatcher, $document["docKey"])) {
+			// Skip this one then.
+			continue;
+		}
+
 		//  . Is the user a guest?
 		//	  If so, userName is like "john (Guest)" and userId like "Guest-8vi6cyBl"
 		$userNameCatcher = '/.*?\(Guest\)$/m';  //anyString (Guest)
@@ -103,6 +115,7 @@ foreach ($documents["documents"] as $index => $document) {
 		} else {
 			$guest = 0;
 		}
+		//todo fix this guest detection
 
 		// Store in database
 		$statement = $db->prepare('INSERT or IGNORE INTO "stats" ("userId", "docKey", "instance", "guest", "source", "timestamp")
