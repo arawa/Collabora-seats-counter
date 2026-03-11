@@ -37,16 +37,21 @@ $token = $matches[1][0];
 $client = new WebSocket\Client("wss://".$CollaboraFQDN."/cool/adminws", [
 	"credentials"=> "include",
 	'headers' => [
+        "User-Agent"=> "collabora_seat_counter",
+        "Origin"=> "https://".$CollaboraFQDN,
         "Accept"=> "*/*",
-        "Accept-Language"=> "en-US,en;q=0.5",
+        "Accept-Language"=> "en-US,en;q=0.9",
+        "Accept-Encoding"=> "gzip, deflate, br, zstd",
         "Sec-WebSocket-Version"=> "13",
         "Sec-WebSocket-Extensions"=> "permessage-deflate",
         "Authorization"=> 'Basic ' . base64_encode($CollaboraAdminUser . ':' . $CollaboraAdminPassword),
+        "Connection"=> "Upgrade",
         "Sec-Fetch-Dest"=> "empty",
         "Sec-Fetch-Mode"=> "websocket",
         "Sec-Fetch-Site"=> "same-origin",
         "Pragma"=> "no-cache",
-        "Cache-Control"=> "no-cache"
+        "Cache-Control"=> "no-cache",
+        "Upgrade"=> "websocket"
 	],
 	'return_obj' => false,
 ]);
